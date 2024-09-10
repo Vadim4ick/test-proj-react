@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { ChangeEvent, FormEvent, useState } from "react";
 import { FieldVariant, FormFieldType } from "../types";
@@ -80,12 +81,11 @@ const DynamicForm = (props: Props) => {
         newErrors[field.id] = "Требуется заполнение label-а";
         hasErrors = true;
       }
-      // Add other validation checks here if needed
     });
 
     if (hasErrors) {
       setErrors(newErrors);
-      return; // Prevent form submission if validation fails
+      return;
     }
 
     const jsonData = fields.map((field) => ({
