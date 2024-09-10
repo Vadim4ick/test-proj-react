@@ -1,0 +1,29 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+h1 {
+  text-align: center;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+}
+
+.form__action {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.form__submit {
+  width: fit-content;
+}
+
+button {
+  cursor: pointer;
+}
