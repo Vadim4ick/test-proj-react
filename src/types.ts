@@ -1,4 +1,4 @@
-// Define interfaces
+// // Define interfaces
 
 export enum FieldVariant {
   TEXT = "text",

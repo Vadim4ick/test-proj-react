@@ -1,10 +1,16 @@
-import { useState, ChangeEvent, FormEvent } from "react";
+import { ChangeEvent, FormEvent, useState } from "react";
 import { FieldVariant, FormFieldType } from "../types";
 import { generateId } from "../helpers/lib";
+import { FormField } from "./FormField";
 
-export const useFormFields = () => {
+interface Props {
+  setJson: (json: FormFieldType[]) => void;
+}
+
+const DynamicForm = (props: Props) => {
+  const { setJson } = props;
+
   const [fields, setFields] = useState<FormFieldType[]>([]);
-  const [formData, setFormData] = useState<FormFieldType[]>([]);
 
   const addTextField = () => {
     setFields([
@@ -53,7 +59,10 @@ export const useFormFields = () => {
         field.id === id
           ? {
               ...field,
-              value: type === FieldVariant.CHECKBOX ? e.target.checked : value,
+              value:
+                type === FieldVariant.CHECKBOX
+                  ? (e.target as unknown).checked
+                  : value,
             }
           : field
       )
@@ -62,13 +71,16 @@ export const useFormFields = () => {
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     const jsonData = fields.map((field) => ({
       id: field.id,
       type: field.type,
       label: field.label,
       value: field.value,
-    }));
-    setFormData(jsonData);
+    })) as FormFieldType[];
+
+    setJson(jsonData);
+
     console.log("Form Data:", JSON.stringify(jsonData, null, 2));
   };
 
@@ -78,6 +90,7 @@ export const useFormFields = () => {
 
   const handleLabelChange = (e: ChangeEvent<HTMLInputElement>, id: string) => {
     const { value } = e.target;
+
     setFields(
       fields.map((field) =>
         field.id === id
@@ -90,15 +103,37 @@ export const useFormFields = () => {
     );
   };
 
-  return {
-    fields,
-    formData,
-    addTextField,
-    addCheckbox,
-    addDropdown,
-    handleChange,
-    handleSubmit,
-    removeField,
-    handleLabelChange,
-  };
+  return (
+    <form className="form" onSubmit={handleSubmit}>
+      <div className="form__actions">
+        <button type="button" onClick={addTextField}>
+          Добавить текстовое поле
+        </button>
+        <button type="button" onClick={addCheckbox}>
+          Добавить checkbox
+        </button>
+        <button type="button" onClick={addDropdown}>
+          Добавить dropdown
+        </button>
+      </div>
+
+      {fields.map((field) => {
+        return (
+          <FormField
+            key={field.id}
+            field={field}
+            handleChange={handleChange}
+            handleLabelChange={handleLabelChange}
+            removeField={removeField}
+          />
+        );
+      })}
+
+      <button type="submit" className="form__submit">
+        Отправить
+      </button>
+    </form>
+  );
 };
+
+export { DynamicForm };
