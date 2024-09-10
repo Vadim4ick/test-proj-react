@@ -41,8 +41,26 @@ h1 {
 
 button {
   cursor: pointer;
+  height: fit-content;
 }
-
+input {
+  height: fit-content;
+}
 .result {
   align-self: self-start;
+}
+
+.form-field {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.input-error {
+  border: 1px solid red;
+}
+
+.error-message {
+  color: red;
+  font-size: 0.875rem;
 }

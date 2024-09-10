@@ -9,19 +9,25 @@ interface Props {
     id: string
   ) => void;
   removeField: (id: string) => void;
+  error: string;
 }
 
 const FormField = (props: Props) => {
-  const { field, handleChange, handleLabelChange, removeField } = props;
+  const { field, handleChange, handleLabelChange, removeField, error } = props;
 
   return (
-    <div className="form__field">
-      <input
-        type="text"
-        placeholder="Label"
-        value={field.label}
-        onChange={(e) => handleLabelChange(e, field.id)}
-      />
+    <div className={`form-field`}>
+      <div>
+        <input
+          type="text"
+          placeholder="Label"
+          value={field.label}
+          onChange={(e) => handleLabelChange(e, field.id)}
+          className={error ? "input-error" : ""}
+        />
+
+        {error && <div className="error-message">{error}</div>}
+      </div>
 
       {field.type === "text" && (
         <input

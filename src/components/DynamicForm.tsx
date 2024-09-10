@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { ChangeEvent, FormEvent, useState } from "react";
 import { FieldVariant, FormFieldType } from "../types";
 import { generateId } from "../helpers/lib";
@@ -11,6 +12,7 @@ const DynamicForm = (props: Props) => {
   const { setJson } = props;
 
   const [fields, setFields] = useState<FormFieldType[]>([]);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const addTextField = () => {
     setFields([
@@ -59,10 +61,8 @@ const DynamicForm = (props: Props) => {
         field.id === id
           ? {
               ...field,
-              value:
-                type === FieldVariant.CHECKBOX
-                  ? (e.target as unknown).checked
-                  : value,
+              // @ts-ignore
+              value: type === FieldVariant.CHECKBOX ? e.target.checked : value,
             }
           : field
       )
@@ -72,6 +72,22 @@ const DynamicForm = (props: Props) => {
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    const newErrors: Record<string, string> = {};
+    let hasErrors = false;
+
+    fields.forEach((field) => {
+      if (field.label.trim() === "") {
+        newErrors[field.id] = "Требуется заполнение label-а";
+        hasErrors = true;
+      }
+      // Add other validation checks here if needed
+    });
+
+    if (hasErrors) {
+      setErrors(newErrors);
+      return; // Prevent form submission if validation fails
+    }
+
     const jsonData = fields.map((field) => ({
       id: field.id,
       type: field.type,
@@ -80,12 +96,19 @@ const DynamicForm = (props: Props) => {
     })) as FormFieldType[];
 
     setJson(jsonData);
+    setErrors({});
 
     console.log("Form Data:", JSON.stringify(jsonData, null, 2));
   };
 
   const removeField = (id: string) => {
     setFields(fields.filter((field) => field.id !== id));
+
+    setErrors((prevErrors) => {
+      const { [id]: _, ...rest } = prevErrors;
+
+      return rest;
+    });
   };
 
   const handleLabelChange = (e: ChangeEvent<HTMLInputElement>, id: string) => {
@@ -101,6 +124,12 @@ const DynamicForm = (props: Props) => {
           : field
       )
     );
+
+    setErrors((prevErrors) => {
+      const { [id]: _, ...rest } = prevErrors;
+
+      return rest;
+    });
   };
 
   return (
@@ -117,17 +146,16 @@ const DynamicForm = (props: Props) => {
         </button>
       </div>
 
-      {fields.map((field) => {
-        return (
-          <FormField
-            key={field.id}
-            field={field}
-            handleChange={handleChange}
-            handleLabelChange={handleLabelChange}
-            removeField={removeField}
-          />
-        );
-      })}
+      {fields.map((field) => (
+        <FormField
+          key={field.id}
+          field={field}
+          handleChange={handleChange}
+          handleLabelChange={handleLabelChange}
+          removeField={removeField}
+          error={errors[field.id]}
+        />
+      ))}
 
       <button type="submit" className="form__submit">
         Отправить
